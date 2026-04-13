@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login – VITAP LaundryHub</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a1a;
+    --surface: #150f28;
+    --card: #1e1535;
+    --border: rgba(167,139,250,0.18);
+    --accent: #f472b6;
+    --accent2: #a78bfa;
+    --accent3: #2dd4bf;
+    --text: #e2e8f0;
+    --muted: #7c6f9e;
+    --danger: #f87171;
+    --radius: 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 700px 500px at 30% 40%, rgba(167,139,250,0.09) 0%, transparent 60%),
+      radial-gradient(ellipse 500px 400px at 75% 70%, rgba(129,140,248,0.07) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .page {
+    width: 100%;
+    max-width: 480px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .back-link {
+    display: inline-flex; align-items: center; gap: 0.4rem;
+    color: var(--muted); font-size: 0.875rem;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--accent); }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.4rem;
+    color: var(--accent);
+    text-decoration: none;
+    display: flex; align-items: center; gap: 0.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .logo span { color: var(--text); }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 2.5rem;
+  }
+
+  .tab-group {
+    display: flex;
+    background: var(--surface);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 2rem;
+    gap: 4px;
+  }
+  .tab {
+    flex: 1;
+    padding: 0.6rem;
+    border-radius: 9px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+  .subtitle { color: var(--muted); font-size: 0.9rem; margin-bottom: 1.75rem; }
+
+  .form-group { margin-bottom: 1.25rem; }
+  label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  .input-wrap {
+    position: relative;
+  }
+  .input-icon {
+    position: absolute;
+    left: 14px; top: 50%; transform: translateY(-50%);
+    font-size: 1rem;
+    pointer-events: none;
+  }
+  input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 0.8rem 1rem 0.8rem 2.75rem;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(56,189,248,0.1);
+  }
+  input::placeholder { color: var(--muted); }
+
+  .forgot {
+    text-align: right;
+    margin-top: 0.4rem;
+  }
+  .forgot a {
+    color: var(--accent);
+    font-size: 0.8rem;
+    text-decoration: none;
+  }
+  .forgot a:hover { text-decoration: underline; }
+
+  .btn-submit {
+    width: 100%;
+    padding: 0.9rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 0.5rem;
+    transition: all 0.25s;
+    letter-spacing: 0.02em;
+  }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(56,189,248,0.25); }
+
+  .divider {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin: 1.25rem 0;
+    position: relative;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    position: absolute; top: 50%;
+    width: 38%; height: 1px;
+    background: var(--border);
+  }
+  .divider::before { left: 0; }
+  .divider::after { right: 0; }
+
+  .switch-link {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--muted);
+    margin-top: 1.5rem;
+  }
+  .switch-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+  .switch-link a:hover { text-decoration: underline; }
+
+  .alert {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: var(--danger);
+    border-radius: 10px;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    display: none;
+  }
+  .alert.show { display: block; }
+
+  .form-panel { display: none; }
+  .form-panel.active { display: block; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <a class="back-link" href="index.html">← Back to home</a>
+
+  <a class="logo" href="index.html">🫧 <span>VITAP</span> LaundryHub</a>
+
+  <div class="card">
+    <div class="tab-group">
+      <button class="tab active" onclick="switchTab('student')">🎓 Student</button>
+      <button class="tab" onclick="switchTab('admin')">🛡️ Admin</button>
+    </div>
+
+    <!-- STUDENT LOGIN -->
+    <div class="form-panel active" id="student-panel">
+      <h2>Welcome back</h2>
+      <p class="subtitle">Login with your VIT-AP student credentials</p>
+      <div class="alert" id="student-error">Invalid registration number or password.</div>
+      <form onsubmit="handleStudentLogin(event)">
+        <div class="form-group">
+          <label>Registration Number</label>
+          <div class="input-wrap">
+            <span class="input-icon">🎫</span>
+            <input type="text" id="s-reg" placeholder="e.g. 22BCE1234" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="s-pass" placeholder="Enter your password" required>
+          </div>
+          <div class="forgot"><a href="#">Forgot password?</a></div>
+        </div>
+        <button type="submit" class="btn-submit">Login as Student →</button>
+      </form>
+      <div class="switch-link">Don't have an account? <a href="register.html">Register here</a></div>
+    </div>
+
+    <!-- ADMIN LOGIN -->
+    <div class="form-panel" id="admin-panel">
+      <h2>Admin Portal</h2>
+      <p class="subtitle">Login with your VIT-AP staff email</p>
+      <div class="alert" id="admin-error">Invalid email or password.</div>
+      <form onsubmit="handleAdminLogin(event)">
+        <div class="form-group">
+          <label>College Email</label>
+          <div class="input-wrap">
+            <span class="input-icon">📧</span>
+            <input type="email" id="a-email" placeholder="name@vitap.ac.in" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="a-pass" placeholder="Enter admin password" required>
+          </div>
+          <div class="forgot"><a href="#">Forgot password?</a></div>
+        </div>
+        <button type="submit" class="btn-submit">Login as Admin →</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Demo credentials
+  const DEMO_STUDENT = { reg: '22BCE1234', pass: 'student123' };
+  const DEMO_ADMIN = { email: 'admin@vitap.ac.in', pass: 'admin123' };
+
+  function switchTab(role) {
+    document.querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && role === 'student') || (i === 1 && role === 'admin'));
+    });
+    document.getElementById('student-panel').classList.toggle('active', role === 'student');
+    document.getElementById('admin-panel').classList.toggle('active', role === 'admin');
+  }
+
+  function handleStudentLogin(e) {
+    e.preventDefault();
+    const reg = document.getElementById('s-reg').value.trim().toUpperCase();
+    const pass = document.getElementById('s-pass').value;
+
+    fetch('http://localhost:8080/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ regno: reg, password: pass })
+    }).then(res => {
+      if(!res.ok) throw new Error('Bad request');
+      return res.text();
+    }).then(text => {
+      if(text) {
+        let user;
+        try { user = JSON.parse(text); } catch(e) {}
+        if(user && user.regno) {
+          user.name = (user.firstName && user.lastName) ? (user.firstName + ' ' + user.lastName) : 'Student';
+          user.reg = user.regno;
+          localStorage.setItem('vitap_session', JSON.stringify({ role: 'student', ...user }));
+          window.location.href = 'student-dashboard.html';
+          return;
+        }
+      }
+      
+      // Fallback for demo
+      if (reg === DEMO_STUDENT.reg && pass === DEMO_STUDENT.pass) {
+        const u = { name: 'Demo Student', reg: DEMO_STUDENT.reg, email: '22bce1234@vitapstudent.ac.in', block: 'A', room: '204', phone: '9876543210' };
+        localStorage.setItem('vitap_session', JSON.stringify({ role: 'student', ...u }));
+        window.location.href = 'student-dashboard.html';
+      } else {
+        document.getElementById('student-error').classList.add('show');
+      }
+    }).catch(err => {
+      document.getElementById('student-error').classList.add('show');
+    });
+  }
+
+  function handleAdminLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('a-email').value.trim().toLowerCase();
+    const pass = document.getElementById('a-pass').value;
+
+    fetch('http://localhost:8080/api/auth/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, password: pass })
+    }).then(res => res.text()).then(text => {
+      if(text) {
+        let admin;
+        try { admin = JSON.parse(text); } catch(ex) {}
+        if(admin && admin.email) {
+           localStorage.setItem('vitap_session', JSON.stringify({ role: 'admin', email: admin.email }));
+           window.location.href = 'admin-dashboard.html';
+           return;
+        }
+      }
+      
+      // Fallback
+      if (email === DEMO_ADMIN.email && pass === DEMO_ADMIN.pass) {
+        localStorage.setItem('vitap_session', JSON.stringify({ role: 'admin', email }));
+        window.location.href = 'admin-dashboard.html';
+      } else {
+        document.getElementById('admin-error').classList.add('show');
+      }
+    }).catch(err => {
+      document.getElementById('admin-error').classList.add('show');
+    });
+  }
+</script>
+</body>
+</html>

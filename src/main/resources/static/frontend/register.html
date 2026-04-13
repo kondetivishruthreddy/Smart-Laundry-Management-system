@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Register – VITAP LaundryHub</title>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0f1e;
+      --surface: #111827;
+      --card: #161f35;
+      --border: rgba(99, 179, 237, 0.12);
+      --accent: #38bdf8;
+      --accent2: #818cf8;
+      --accent3: #34d399;
+      --text: #e2e8f0;
+      --muted: #64748b;
+      --danger: #f87171;
+      --success: #34d399;
+      --radius: 16px;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 700px 500px at 70% 30%, rgba(129, 140, 248, 0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 500px 400px at 20% 75%, rgba(52, 211, 153, 0.06) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 520px;
+      animation: fadeUp 0.6s ease both;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-decoration: none;
+      margin-bottom: 2rem;
+      transition: color 0.2s;
+    }
+
+    .back-link:hover {
+      color: var(--accent);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      color: var(--accent);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .logo span {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2.5rem;
+    }
+
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 460px) {
+      .row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 1.15rem;
+    }
+
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .input-wrap {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.95rem;
+      pointer-events: none;
+    }
+
+    input,
+    select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.78rem 1rem 0.78rem 2.6rem;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      appearance: none;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.1);
+    }
+
+    input::placeholder {
+      color: var(--muted);
+    }
+
+    select option {
+      background: var(--surface);
+    }
+
+    .hint {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .password-strength {
+      margin-top: 0.4rem;
+      display: flex;
+      gap: 4px;
+    }
+
+    .strength-bar {
+      height: 3px;
+      flex: 1;
+      border-radius: 4px;
+      background: var(--border);
+      transition: background 0.3s;
+    }
+
+    .terms {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin: 1.25rem 0;
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .terms input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      min-width: 18px;
+      padding: 0;
+      accent-color: var(--accent);
+      margin-top: 1px;
+    }
+
+    .terms a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 0.9rem;
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      color: #0a0f1e;
+      border: none;
+      border-radius: 12px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s;
+      letter-spacing: 0.02em;
+    }
+
+    .btn-submit:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(52, 211, 153, 0.25);
+    }
+
+    .switch-link {
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--muted);
+      margin-top: 1.5rem;
+    }
+
+    .switch-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .tab-group {
+      display: flex;
+      background: var(--surface);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 2rem;
+      gap: 4px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 0.6rem;
+      border-radius: 9px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab.active {
+      background: var(--card);
+      color: var(--text);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+      border: 1px solid var(--border);
+    }
+
+    .form-panel {
+      display: none;
+    }
+
+    .form-panel.active {
+      display: block;
+    }
+
+    .alert {
+      border-radius: 10px;
+      padding: 0.75rem 1rem;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+
+    .alert.show {
+      display: block;
+    }
+
+    .alert.error {
+      background: rgba(248, 113, 113, 0.1);
+      border: 1px solid rgba(248, 113, 113, 0.3);
+      color: var(--danger);
+    }
+
+    .alert.success {
+      background: rgba(52, 211, 153, 0.1);
+      border: 1px solid rgba(52, 211, 153, 0.3);
+      color: var(--success);
+    }
+
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(24px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html">← Back to home</a>
+    <a class="logo" href="index.html">🫧 <span>VITAP</span> LaundryHub</a>
+
+    <div class="card">
+      <div class="tab-group">
+        <button class="tab active" onclick="switchTab('student')">🎓 Student</button>
+        <button class="tab" onclick="switchTab('admin')">🛡️ Admin</button>
+      </div>
+
+      <!-- STUDENT REGISTER -->
+      <div class="form-panel active" id="student-panel">
+        <h2>Create Account</h2>
+        <p class="subtitle">Register with your VIT-AP student credentials</p>
+
+        <div class="alert error" id="err-msg"></div>
+        <div class="alert success" id="ok-msg"></div>
+
+        <form onsubmit="handleRegister(event)">
+          <div class="row">
+            <div class="form-group">
+              <label>First Name</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="r-fname" placeholder="Arjun" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Last Name</label>
+              <div class="input-wrap">
+                <span class="input-icon">👤</span>
+                <input type="text" id="r-lname" placeholder="Reddy" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Registration Number</label>
+            <div class="input-wrap">
+              <span class="input-icon">🎫</span>
+              <input type="text" id="r-reg" placeholder="22BCE1234" maxlength="12" required>
+            </div>
+            <p class="hint">Format: YYBranchNNNN (e.g., 22BCE1234)</p>
+          </div>
+
+          <div class="form-group">
+            <label>College Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="r-email" placeholder="22bce1234@vitapstudent.ac.in" required>
+            </div>
+            <p class="hint">Must be your @vitapstudent.ac.in address</p>
+          </div>
+
+          <div class="row">
+            <div class="form-group">
+              <label>Block / Hostel</label>
+              <div class="input-wrap">
+                <span class="input-icon">🏠</span>
+                <select id="r-block" required>
+                  <option value="">Select Block</option>
+                  <option>MH1</option>
+                  <option>MH2</option>
+                  <option>MH3</option>
+                  <option>MH4</option>
+                  <option>MH5</option>
+                  <option>MH6</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Room Number</label>
+              <div class="input-wrap">
+                <span class="input-icon">🚪</span>
+                <input type="text" id="r-room" placeholder="A-204" required>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Phone Number</label>
+            <div class="input-wrap">
+              <span class="input-icon">📱</span>
+              <input type="tel" id="r-phone" placeholder="9876543210" maxlength="10" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="r-pass" placeholder="Min. 8 characters" oninput="updateStrength()" required>
+            </div>
+            <div class="password-strength">
+              <div class="strength-bar" id="sb1"></div>
+              <div class="strength-bar" id="sb2"></div>
+              <div class="strength-bar" id="sb3"></div>
+              <div class="strength-bar" id="sb4"></div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="r-cpass" placeholder="Repeat password" required>
+            </div>
+          </div>
+
+          <div class="terms">
+            <input type="checkbox" id="r-terms" required>
+            <label for="r-terms"
+              style="text-transform:none; letter-spacing:0; font-size:0.85rem; color:var(--muted); margin:0;">
+              I agree to the <a href="#">Terms of Service</a> and confirm these are my VIT-AP credentials
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit">Create My Account →</button>
+        </form>
+
+        <div class="switch-link">Already have an account? <a href="login.html">Login here</a></div>
+      </div>
+
+      <!-- ADMIN REGISTER -->
+      <div class="form-panel" id="admin-panel">
+        <h2>Admin Portal</h2>
+        <p class="subtitle">Register with your VIT-AP staff email</p>
+
+        <div class="alert error" id="a-err-msg"></div>
+        <div class="alert success" id="a-ok-msg"></div>
+
+        <form onsubmit="handleAdminRegister(event)">
+          <div class="form-group">
+            <label>College Email</label>
+            <div class="input-wrap">
+              <span class="input-icon">📧</span>
+              <input type="email" id="ra-email" placeholder="name@vitap.ac.in" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="ra-pass" placeholder="Min. 8 characters" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Confirm Password</label>
+            <div class="input-wrap">
+              <span class="input-icon">🔒</span>
+              <input type="password" id="ra-cpass" placeholder="Repeat password" required>
+            </div>
+          </div>
+
+          <button type="submit" class="btn-submit">Register as Admin →</button>
+        </form>
+        <div class="switch-link">Already an admin? <a href="login.html">Login here</a></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function switchTab(role) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', (i === 0 && role === 'student') || (i === 1 && role === 'admin'));
+      });
+      document.getElementById('student-panel').classList.toggle('active', role === 'student');
+      document.getElementById('admin-panel').classList.toggle('active', role === 'admin');
+    }
+
+    function updateStrength() {
+      const pass = document.getElementById('r-pass').value;
+      let score = 0;
+      if (pass.length >= 8) score++;
+      if (/[A-Z]/.test(pass)) score++;
+      if (/[0-9]/.test(pass)) score++;
+      if (/[^A-Za-z0-9]/.test(pass)) score++;
+
+      const colors = ['#f87171', '#fb923c', '#facc15', '#34d399'];
+      for (let i = 1; i <= 4; i++) {
+        const bar = document.getElementById('sb' + i);
+        bar.style.background = i <= score ? colors[score - 1] : 'var(--border)';
+      }
+    }
+
+    function handleRegister(e) {
+      e.preventDefault();
+      const fname = document.getElementById('r-fname').value.trim();
+      const lname = document.getElementById('r-lname').value.trim();
+      const reg = document.getElementById('r-reg').value.trim().toUpperCase();
+      const email = document.getElementById('r-email').value.trim().toLowerCase();
+      const block = document.getElementById('r-block').value;
+      const room = document.getElementById('r-room').value.trim();
+      const phone = document.getElementById('r-phone').value.trim();
+      const pass = document.getElementById('r-pass').value;
+      const cpass = document.getElementById('r-cpass').value;
+
+      const errEl = document.getElementById('err-msg');
+      const okEl = document.getElementById('ok-msg');
+      errEl.classList.remove('show');
+      okEl.classList.remove('show');
+
+      // Validation
+      if (!email.endsWith('@vitapstudent.ac.in')) {
+        errEl.textContent = 'Please use your @vitapstudent.ac.in college email.';
+        errEl.classList.add('show'); return;
+      }
+      if (!/^\d{2}[A-Z]{3}\d{4}$/.test(reg)) {
+        errEl.textContent = 'Invalid registration number format. Use e.g. 22BCE1234.';
+        errEl.classList.add('show'); return;
+      }
+      if (pass !== cpass) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.classList.add('show'); return;
+      }
+      if (pass.length < 8) {
+        errEl.textContent = 'Password must be at least 8 characters.';
+        errEl.classList.add('show'); return;
+      }
+
+      // Check duplicates
+      // We now rely on backend, or we can just proceed.
+      fetch('http://localhost:8080/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: fname,
+          lastName: lname,
+          regno: reg,
+          email: email,
+          block: block,
+          room: room,
+          phone: phone,
+          password: pass,
+          joinedAt: new Date().toISOString()
+        })
+      }).then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Registration failed');
+      }).then(data => {
+        okEl.textContent = '🎉 Registration successful! Redirecting to login...';
+        okEl.classList.add('show');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+      }).catch(err => {
+        errEl.textContent = 'Registration failed. Backend error or duplicate.';
+        errEl.classList.add('show');
+      });
+    }
+
+    function handleAdminRegister(e) {
+      e.preventDefault();
+      const email = document.getElementById('ra-email').value.trim().toLowerCase();
+      const pass = document.getElementById('ra-pass').value;
+      const cpass = document.getElementById('ra-cpass').value;
+
+      const errEl = document.getElementById('a-err-msg');
+      const okEl = document.getElementById('a-ok-msg');
+      errEl.classList.remove('show');
+      okEl.classList.remove('show');
+
+      if (!email.endsWith('@vitap.ac.in')) {
+        errEl.textContent = 'Please use a valid @vitap.ac.in staff email.';
+        errEl.classList.add('show'); return;
+      }
+      if (pass !== cpass) {
+        errEl.textContent = 'Passwords do not match.';
+        errEl.classList.add('show'); return;
+      }
+      if (pass.length < 8) {
+        errEl.textContent = 'Password must be at least 8 characters.';
+        errEl.classList.add('show'); return;
+      }
+
+      fetch('http://localhost:8080/api/auth/admin-register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: email, password: pass })
+      }).then(res => {
+        if (res.ok) return res.json();
+        throw new Error('Registration failed');
+      }).then(data => {
+        okEl.textContent = '🎉 Admin registered successfully! Redirecting...';
+        okEl.classList.add('show');
+        setTimeout(() => window.location.href = 'login.html', 2000);
+      }).catch(err => {
+        errEl.textContent = 'Registration failed. Check if email exists.';
+        errEl.classList.add('show');
+      });
+    }
+  </script>
+</body>
+
+</html>

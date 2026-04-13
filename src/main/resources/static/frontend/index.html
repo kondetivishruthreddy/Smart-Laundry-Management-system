@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VITAP LaundryHub – Smart Laundry System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0a1a;
+    --surface: #150f28;
+    --card: #1e1535;
+    --border: rgba(167,139,250,0.18);
+    --accent: #f472b6;
+    --accent2: #a78bfa;
+    --accent3: #2dd4bf;
+    --text: #e2e8f0;
+    --muted: #7c6f9e;
+    --danger: #f87171;
+    --radius: 16px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* BG mesh */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 800px 600px at 20% 20%, rgba(167,139,250,0.09) 0%, transparent 60%),
+      radial-gradient(ellipse 600px 500px at 80% 80%, rgba(244,114,182,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 400px 300px at 60% 10%, rgba(45,212,191,0.05) 0%, transparent 60%);
+    pointer-events: none; z-index: 0;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1rem 2.5rem;
+    background: rgba(13,10,26,0.85);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border);
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: 1.3rem;
+    color: var(--accent);
+    display: flex; align-items: center; gap: 0.5rem;
+    text-decoration: none;
+  }
+  .logo span { color: var(--text); }
+  .nav-links { display: flex; gap: 0.75rem; }
+  .nav-btn {
+    padding: 0.5rem 1.25rem;
+    border-radius: 50px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    border: none;
+  }
+  .nav-btn.outline {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .nav-btn.outline:hover { border-color: var(--accent); color: var(--accent); }
+  .nav-btn.filled {
+    background: var(--accent);
+    color: #0d0a1a;
+    font-weight: 600;
+  }
+  .nav-btn.filled:hover { background: #f9a8d4; }
+
+  /* HERO */
+  .hero {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 8rem 1.5rem 4rem;
+  }
+  .badge {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: rgba(244,114,182,0.12);
+    border: 1px solid rgba(56,189,248,0.25);
+    color: var(--accent);
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    animation: fadeUp 0.6s ease both;
+  }
+  .badge::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2.5rem, 6vw, 5rem);
+    font-weight: 800;
+    line-height: 1.05;
+    margin-bottom: 1.25rem;
+    animation: fadeUp 0.7s 0.1s ease both;
+  }
+  .hero h1 .grad {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero p {
+    font-size: 1.15rem;
+    color: var(--muted);
+    max-width: 540px;
+    line-height: 1.7;
+    margin-bottom: 2.5rem;
+    animation: fadeUp 0.7s 0.2s ease both;
+  }
+  .hero-cta {
+    display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;
+    animation: fadeUp 0.7s 0.3s ease both;
+  }
+  .btn-primary {
+    padding: 0.85rem 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    color: #fff;
+    border: none;
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 30px rgba(56,189,248,0.3); }
+  .btn-ghost {
+    padding: 0.85rem 2rem;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 50px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-decoration: none;
+    display: inline-block;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* STATS */
+  .stats-strip {
+    position: relative; z-index: 1;
+    display: flex; justify-content: center; flex-wrap: wrap;
+    gap: 2rem;
+    padding: 2rem;
+    animation: fadeUp 0.8s 0.4s ease both;
+  }
+  .stat {
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .stat-label { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+
+  /* FEATURES */
+  .section {
+    position: relative; z-index: 1;
+    padding: 5rem 2rem;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .section-label {
+    font-size: 0.75rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent2);
+    font-weight: 600; margin-bottom: 0.75rem;
+  }
+  .section h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(1.75rem, 3vw, 2.75rem);
+    font-weight: 700;
+    margin-bottom: 1rem;
+  }
+  .section > p {
+    color: var(--muted); font-size: 1.05rem;
+    max-width: 560px; line-height: 1.7;
+    margin-bottom: 3rem;
+  }
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.25rem;
+  }
+  .feature-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.75rem;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .feature-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    opacity: 0; transition: opacity 0.3s;
+    background: radial-gradient(ellipse at top left, rgba(244,114,182,0.07), transparent 60%);
+  }
+  .feature-card:hover { border-color: rgba(56,189,248,0.3); transform: translateY(-3px); }
+  .feature-card:hover::before { opacity: 1; }
+  .feature-icon {
+    width: 46px; height: 46px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+  }
+  .ic-blue { background: rgba(244,114,182,0.14); }
+  .ic-purple { background: rgba(167,139,250,0.14); }
+  .ic-green { background: rgba(45,212,191,0.12); }
+  .ic-yellow { background: rgba(251,191,36,0.12); }
+  .feature-card h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.05rem; font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  .feature-card p { color: var(--muted); font-size: 0.9rem; line-height: 1.6; }
+
+  /* HOW IT WORKS */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1.5rem;
+    counter-reset: step;
+  }
+  .step {
+    position: relative;
+    padding: 1.5rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    counter-increment: step;
+  }
+  .step::before {
+    content: counter(step, decimal-leading-zero);
+    font-family: 'Syne', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: rgba(244,114,182,0.18);
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+  .step h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 0.4rem; }
+  .step p { color: var(--muted); font-size: 0.875rem; line-height: 1.6; }
+
+  /* FOOTER */
+  footer {
+    position: relative; z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 600px) {
+    nav { padding: 1rem; }
+    .hero h1 { font-size: 2.2rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="index.html">🫧 <span>VITAP</span> LaundryHub</a>
+  <div class="nav-links">
+    <a class="nav-btn outline" href="login.html">Login</a>
+    <a class="nav-btn filled" href="register.html">Register</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="badge">✦ VIT-AP University – Smart Campus</div>
+  <h1>Laundry, <span class="grad">Simplified</span><br>for Every Student</h1>
+  <p>Book, track, and manage your laundry slots right from your phone. No more waiting in queues or missing your clothes.</p>
+  <div class="hero-cta">
+    <a href="register.html" class="btn-primary">Get Started Free</a>
+    <a href="login.html" class="btn-ghost">I already have an account</a>
+  </div>
+</section>
+
+<div class="stats-strip">
+  <div class="stat"><div class="stat-num">12+</div><div class="stat-label">Washing Machines</div></div>
+  <div class="stat"><div class="stat-num">2400+</div><div class="stat-label">Students Served</div></div>
+  <div class="stat"><div class="stat-num">98%</div><div class="stat-label">On-time Delivery</div></div>
+  <div class="stat"><div class="stat-num">24/7</div><div class="stat-label">Slot Availability</div></div>
+</div>
+
+<section class="section">
+  <div class="section-label">Why use LaundryHub</div>
+  <h2>Everything you need, nothing you don't</h2>
+  <p>Built specifically for VIT-AP hostel students — fast, clean, and dead simple to use.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon ic-blue">📅</div>
+      <h3>Slot Booking</h3>
+      <p>Reserve your preferred time slot in advance. Never wait in a queue again.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon ic-green">📦</div>
+      <h3>Order Tracking</h3>
+      <p>Real-time status updates — from pickup to delivery, track every step.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon ic-purple">🔔</div>
+      <h3>Smart Alerts</h3>
+      <p>Get notified when your laundry is ready so you never miss a pickup.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon ic-yellow">🛡️</div>
+      <h3>Secure & Private</h3>
+      <p>Your college credentials keep everything verified and safe within campus.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon ic-blue">🧺</div>
+      <h3>Wash Types</h3>
+      <p>Choose between regular wash, dry cleaning, or express service.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon ic-green">📊</div>
+      <h3>Admin Dashboard</h3>
+      <p>Hostel admins get a full view of orders, machines, and student requests.</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="section-label">How it works</div>
+  <h2>Ready in 4 simple steps</h2>
+  <p>Getting your laundry done has never been this easy at VIT-AP.</p>
+  <div class="steps">
+    <div class="step">
+      <h4>Register</h4>
+      <p>Use your VIT-AP registration number and college email to sign up.</p>
+    </div>
+    <div class="step">
+      <h4>Book a Slot</h4>
+      <p>Pick a date, time, and service type that works for your schedule.</p>
+    </div>
+    <div class="step">
+      <h4>Drop Off</h4>
+      <p>Leave your clothes at the laundry counter at your booked time.</p>
+    </div>
+    <div class="step">
+      <h4>Pick Up</h4>
+      <p>Get notified and collect your fresh, clean laundry on time.</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>© 2025 VITAP LaundryHub &nbsp;·&nbsp; VIT-AP University, Amaravati &nbsp;·&nbsp; Built for students, by students &nbsp;·&nbsp; <a href="login.html">Admin Login</a></p>
+</footer>
+
+</body>
+</html>
