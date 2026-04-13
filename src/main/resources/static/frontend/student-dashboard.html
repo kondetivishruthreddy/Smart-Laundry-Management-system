@@ -547,7 +547,7 @@
     // Register Bag via backend
     const bagId = String(Date.now()).slice(-6);
     
-    fetch('http://localhost:8080/api/bags', {
+    fetch('https://smart-laundry-management-system.onrender.com/api/bags', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
