@@ -284,87 +284,42 @@
 </div>
 
 <script>
-  // Demo credentials
-  const DEMO_STUDENT = { reg: '22BCE1234', pass: 'student123' };
-  const DEMO_ADMIN = { email: 'admin@vitap.ac.in', pass: 'admin123' };
+const API = window.location.origin;
 
-  function switchTab(role) {
-    document.querySelectorAll('.tab').forEach((t, i) => {
-      t.classList.toggle('active', (i === 0 && role === 'student') || (i === 1 && role === 'admin'));
-    });
-    document.getElementById('student-panel').classList.toggle('active', role === 'student');
-    document.getElementById('admin-panel').classList.toggle('active', role === 'admin');
-  }
+function handleStudentLogin(e) {
+  e.preventDefault();
 
-  function handleStudentLogin(e) {
-    e.preventDefault();
-    const reg = document.getElementById('s-reg').value.trim().toUpperCase();
-    const pass = document.getElementById('s-pass').value;
+  const reg = document.getElementById('s-reg').value.trim().toUpperCase();
+  const pass = document.getElementById('s-pass').value;
 
-    fetch('https://smart-laundry-management-system.onrender.com/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ regno: reg, password: pass })
-    }).then(res => {
-      if(!res.ok) throw new Error('Bad request');
-      return res.text();
-    }).then(text => {
-      if(text) {
-        let user;
-        try { user = JSON.parse(text); } catch(e) {}
-        if(user && user.regno) {
-          user.name = (user.firstName && user.lastName) ? (user.firstName + ' ' + user.lastName) : 'Student';
-          user.reg = user.regno;
-          localStorage.setItem('vitap_session', JSON.stringify({ role: 'student', ...user }));
-          window.location.href = 'student-dashboard.html';
-          return;
-        }
-      }
-      
-      // Fallback for demo
-      if (reg === DEMO_STUDENT.reg && pass === DEMO_STUDENT.pass) {
-        const u = { name: 'Demo Student', reg: DEMO_STUDENT.reg, email: '22bce1234@vitapstudent.ac.in', block: 'A', room: '204', phone: '9876543210' };
-        localStorage.setItem('vitap_session', JSON.stringify({ role: 'student', ...u }));
-        window.location.href = 'student-dashboard.html';
-      } else {
-        document.getElementById('student-error').classList.add('show');
-      }
-    }).catch(err => {
+  fetch(API + "/api/auth/login", {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ regno: reg, password: pass })
+  })
+  .then(res => res.json())
+  .then(user => {
+
+    console.log("LOGIN RESPONSE:", user);
+
+    if (user && user.regno) {
+
+      user.reg = user.regno; // 🔥 important
+      user.name = user.firstName ? user.firstName : "Student";
+
+      // 🔥 FINAL STORAGE FIX
+      localStorage.setItem("vitap_session", JSON.stringify(user));
+
+      window.location.href = "student-dashboard.html";
+
+    } else {
       document.getElementById('student-error').classList.add('show');
-    });
-  }
-
-  function handleAdminLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('a-email').value.trim().toLowerCase();
-    const pass = document.getElementById('a-pass').value;
-
-    fetch('https://smart-laundry-management-system.onrender.com/api/auth/admin-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: email, password: pass })
-    }).then(res => res.text()).then(text => {
-      if(text) {
-        let admin;
-        try { admin = JSON.parse(text); } catch(ex) {}
-        if(admin && admin.email) {
-           localStorage.setItem('vitap_session', JSON.stringify({ role: 'admin', email: admin.email }));
-           window.location.href = 'admin-dashboard.html';
-           return;
-        }
-      }
-      
-      // Fallback
-      if (email === DEMO_ADMIN.email && pass === DEMO_ADMIN.pass) {
-        localStorage.setItem('vitap_session', JSON.stringify({ role: 'admin', email }));
-        window.location.href = 'admin-dashboard.html';
-      } else {
-        document.getElementById('admin-error').classList.add('show');
-      }
-    }).catch(err => {
-      document.getElementById('admin-error').classList.add('show');
-    });
-  }
+    }
+  })
+  .catch(() => {
+    document.getElementById('student-error').classList.add('show');
+  });
+}
 </script>
 </body>
 </html>
