@@ -667,182 +667,48 @@
   <div class="alert-toast" id="toast"></div>
 
   <script>
-    // Auth guard
-    const session = JSON.parse(localStorage.getItem('vitap_session') || 'null');
-    if (!session || session.role !== 'admin') window.location.href = 'login.html';
-    document.getElementById('admin-email-disp').textContent = session.email || 'admin@vitap.ac.in';
+const API = window.location.origin;
 
-    function logout() { localStorage.removeItem('vitap_session'); window.location.href = 'login.html'; }
+function loadAdmin() {
 
-    let allOrdersCache = [];
-    async function loadAllOrders() {
-      try {
-        const res = await fetch('https://smart-laundry-management-system.onrender.com/api/bags');
-        allOrdersCache = await res.json();
-        renderOverview();
-        if (document.getElementById('panel-orders').classList.contains('active')) renderAllOrders();
-      } catch (e) { console.error('Failed to load bags', e); }
+  fetch(API + "/api/bags")
+  .then(res => res.json())
+  .then(data => {
+
+    var list = document.getElementById("list");
+    list.innerHTML = "";
+
+    for (var i = 0; i < data.length; i++) {
+
+      var b = data[i];
+
+      var li = document.createElement("li");
+
+      li.innerHTML =
+        b.bagId + " - " + b.status +
+        " <button onclick=\"markReady('" + b.bagId + "')\">READY</button>";
+
+      list.appendChild(li);
     }
+  });
+}
 
-    let allStudentsCache = [];
-    async function loadAllStudents() {
-      try {
-        const res = await fetch('https://smart-laundry-management-system.onrender.com/api/auth/users');
-        allStudentsCache = await res.json();
-        if (document.getElementById('panel-students').classList.contains('active')) renderStudents();
-      } catch (e) { console.error('Failed to load students', e); }
-    }
+// ✅ MARK READY
+function markReady(id) {
 
-    function getAllOrders() { return allOrdersCache; }
-    function getStudents() { return allStudentsCache; }
+  fetch(API + "/api/bags/ready?bagId=" + id, {
+    method: "PUT"
+  }).then(loadAdmin);
+}
 
-    function showPanel(id) {
-      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-      document.getElementById('panel-' + id).classList.add('active');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      event.target.classList.add('active');
-      const t = { overview: 'Overview', orders: 'All Orders', students: 'Students', machines: 'Machines' };
-      document.getElementById('page-title').textContent = t[id] || id;
-      if (id === 'overview') renderOverview();
-      if (id === 'orders') renderAllOrders();
-      if (id === 'students') renderStudents();
-      if (id === 'machines') renderMachines();
-    }
+// 🚪 LOGOUT
+function logout() {
+  localStorage.removeItem("vitap_session");
+  window.location = "login.html";
+}
 
-    function badgeHtml(s) {
-      const map = { Pending: 'pending', Processing: 'processing', Ready: 'ready', Delivered: 'delivered', Cancelled: 'cancelled' };
-      return `<span class="badge badge-${map[s] || 'pending'}">${s}</span>`;
-    }
-
-    function renderOverview() {
-      const orders = getAllOrders();
-      const students = getStudents();
-      document.getElementById('a-total').textContent = orders.length;
-      document.getElementById('a-pending').textContent = orders.filter(o => o.status === 'Pending').length;
-      document.getElementById('a-processing').textContent = orders.filter(o => o.status === 'Processing').length;
-      document.getElementById('a-ready').textContent = orders.filter(o => o.status === 'Ready').length;
-      document.getElementById('a-students').textContent = students.length;
-
-      const recent = orders.slice(-10).reverse();
-      const el = document.getElementById('overview-recent');
-      if (!recent.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📭</div><p>No orders yet.</p></div>'; return; }
-      el.innerHTML = ordersTableHtml(recent, true);
-    }
-
-    function ordersTableHtml(orders, showAction = false) {
-      if (!orders.length) return '<div class="empty-state"><div class="icon">📭</div><p>No orders match the filter.</p></div>';
-      return `<div style="overflow-x:auto"><table class="orders-table">
-      <thead><tr>
-        <th>Order ID</th>
-        <th>Student</th>
-        <th>Reg No.</th>
-        <th>Date</th>
-        <th>Slot</th>
-        <th>Service</th>
-        <th>Status</th>
-        ${showAction ? '<th>Update</th>' : ''}
-      </tr></thead>
-      <tbody>${orders.map((o, idx) => `<tr>
-        <td><strong style="font-family:'Syne',sans-serif">#${o.bagId || o.id}</strong></td>
-        <td>${o.studentName || '—'}</td>
-        <td>${o.reg || '—'}</td>
-        <td>${o.date}</td>
-        <td>${o.slot}</td>
-        <td>${o.service}</td>
-        <td>${badgeHtml(o.status)}</td>
-        ${showAction ? `<td><select class="status-select" data-id="${o.bagId || o.id}" onchange="updateStatus(this)">
-          <option ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
-          <option ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
-          <option ${o.status === 'Ready' ? 'selected' : ''}>Ready</option>
-          <option ${o.status === 'Delivered' ? 'selected' : ''}>Delivered</option>
-          <option ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
-        </select></td>` : ''}
-      </tr>`).join('')}</tbody>
-    </table></div>`;
-    }
-
-    function renderAllOrders() {
-      let orders = getAllOrders();
-      const statusF = document.getElementById('filter-status').value;
-      const serviceF = document.getElementById('filter-service').value;
-      const search = document.getElementById('search-orders').value.toLowerCase();
-
-      if (statusF) orders = orders.filter(o => o.status === statusF);
-      if (serviceF) orders = orders.filter(o => o.service === serviceF);
-      if (search) orders = orders.filter(o => (o.reg || '').toLowerCase().includes(search) || (o.studentName || '').toLowerCase().includes(search));
-
-      document.getElementById('all-orders-table').innerHTML = ordersTableHtml(orders.reverse(), true);
-    }
-
-    function updateStatus(select) {
-      const id = select.dataset.id;
-      const newStatus = select.value;
-
-      fetch(`https://smart-laundry-management-system.onrender.com/api/bags/status?bagId=${id}&status=${newStatus}`, { method: 'PUT' })
-        .then(() => {
-          const o = allOrdersCache.find(x => x.bagId === id || x.id === id);
-          if (o) o.status = newStatus;
-          showToast(`✅ Order #${id} updated to ${newStatus}`);
-          renderOverview();
-        }).catch(err => {
-          showToast(`❌ Failed to update order #${id}`);
-        });
-    }
-
-    function renderStudents() {
-      const students = getStudents();
-      const el = document.getElementById('students-table');
-      if (!students.length) { el.innerHTML = '<div class="empty-state"><div class="icon">👥</div><p>No students registered yet.</p></div>'; return; }
-      el.innerHTML = `<div style="overflow-x:auto"><table class="students-table">
-      <thead><tr><th>Name</th><th>Reg No.</th><th>Email</th><th>Block</th><th>Room</th><th>Phone</th><th>Joined</th></tr></thead>
-      <tbody>${students.map(s => `<tr>
-        <td>${s.name || ((s.firstName || '') + ' ' + (s.lastName || '')).trim()}</td>
-        <td style="font-family:'Syne',sans-serif;font-weight:700">${s.regno || s.reg}</td>
-        <td style="color:var(--muted)">${s.email}</td>
-        <td>${s.block || '—'}</td>
-        <td>${s.room || '—'}</td>
-        <td>${s.phone || '—'}</td>
-        <td style="color:var(--muted)">${new Date(s.joinedAt).toLocaleDateString()}</td>
-      </tr>`).join('')}</tbody>
-    </table></div>`;
-    }
-
-    function renderMachines() {
-      const machines = getMachines();
-      const grid = document.getElementById('machine-grid');
-      const statusIcons = { Idle: '🟢', Running: '🟡', Maintenance: '🔴' };
-      const statusClass = { Idle: 'ms-idle', Running: 'ms-running', Maintenance: 'ms-maintenance' };
-      grid.innerHTML = machines.map(m => `
-      <div class="machine-card" onclick="toggleMachine(${m.id})">
-        <div class="machine-icon">${m.status === 'Idle' ? '🌀' : m.status === 'Running' ? '⚙️' : '🛠️'}</div>
-        <div class="machine-name">${m.name}</div>
-        <div class="machine-status ${statusClass[m.status]}">${statusIcons[m.status]} ${m.status}</div>
-      </div>
-    `).join('');
-    }
-
-    function toggleMachine(id) {
-      const machines = getMachines();
-      const m = machines.find(x => x.id === id);
-      if (!m) return;
-      const cycle = { Idle: 'Running', Running: 'Maintenance', Maintenance: 'Idle' };
-      m.status = cycle[m.status];
-      saveMachines(machines);
-      showToast(`🌀 ${m.name} → ${m.status}`);
-      renderMachines();
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById('toast');
-      t.textContent = msg;
-      t.classList.add('show');
-      setTimeout(() => t.classList.remove('show'), 3000);
-    }
-
-    // Init
-    loadAllOrders();
-    loadAllStudents();
-  </script>
+loadAdmin();
+</script>
 </body>
 
 </html>
