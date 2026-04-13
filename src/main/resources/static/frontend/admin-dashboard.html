@@ -677,7 +677,7 @@
     let allOrdersCache = [];
     async function loadAllOrders() {
       try {
-        const res = await fetch('http://localhost:8080/api/bags');
+        const res = await fetch('https://smart-laundry-management-system.onrender.com/api/bags');
         allOrdersCache = await res.json();
         renderOverview();
         if (document.getElementById('panel-orders').classList.contains('active')) renderAllOrders();
@@ -687,7 +687,7 @@
     let allStudentsCache = [];
     async function loadAllStudents() {
       try {
-        const res = await fetch('http://localhost:8080/api/auth/users');
+        const res = await fetch('https://smart-laundry-management-system.onrender.com/api/auth/users');
         allStudentsCache = await res.json();
         if (document.getElementById('panel-students').classList.contains('active')) renderStudents();
       } catch (e) { console.error('Failed to load students', e); }
@@ -778,7 +778,7 @@
       const id = select.dataset.id;
       const newStatus = select.value;
 
-      fetch(`http://localhost:8080/api/bags/status?bagId=${id}&status=${newStatus}`, { method: 'PUT' })
+      fetch(`https://smart-laundry-management-system.onrender.com/api/bags/status?bagId=${id}&status=${newStatus}`, { method: 'PUT' })
         .then(() => {
           const o = allOrdersCache.find(x => x.bagId === id || x.id === id);
           if (o) o.status = newStatus;
