@@ -426,7 +426,7 @@
   let currentOrders = [];
   async function loadOrders() {
     try {
-      const res = await fetch('http://localhost:8080/api/bags');
+      const res = await fetch('https://smart-laundry-management-system.onrender.com/api/bags');
       const all = await res.json();
       currentOrders = all.filter(b => b.user === session.reg);
       renderDashboard();
