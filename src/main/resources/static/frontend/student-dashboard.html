@@ -413,191 +413,67 @@
 <div class="alert-toast" id="toast"></div>
 
 <script>
-  // Auth guard
-  const session = JSON.parse(localStorage.getItem('vitap_session') || 'null');
-  if (!session || session.role !== 'student') window.location.href = 'login.html';
+const API = window.location.origin;
 
-  // Populate user info
-  document.getElementById('uname').textContent = session.name || 'Student';
-  document.getElementById('ureg').textContent = session.reg || '';
-  document.getElementById('av').textContent = (session.name || 'S')[0].toUpperCase();
+var user = JSON.parse(localStorage.getItem("vitap_session"));
 
-  // Orders fetch
-  let currentOrders = [];
-  async function loadOrders() {
-    try {
-      const res = await fetch('https://smart-laundry-management-system.onrender.com/api/bags');
-      const all = await res.json();
-      currentOrders = all.filter(b => b.user === session.reg);
-      renderDashboard();
-      if(document.getElementById('panel-orders').classList.contains('active')) renderOrders();
-    } catch(e) { console.error('Failed to load orders', e); }
-  }
+if (!user) {
+  alert("Session expired. Please login again.");
+  window.location = "login.html";
+}
 
-  function logout() { localStorage.removeItem('vitap_session'); window.location.href = 'login.html'; }
+console.log("USER:", user);
 
-  function showPanel(id) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    event.target.classList.add('active');
-    const titles = { dashboard: 'Dashboard', book: 'Book a Slot', orders: 'My Orders', profile: 'My Profile' };
-    document.getElementById('page-title').textContent = titles[id] || id;
-    if (id === 'orders') renderOrders();
-    if (id === 'dashboard') renderDashboard();
-    if (id === 'profile') renderProfile();
-    document.getElementById('sidebar').classList.remove('open');
-  }
+// 🧺 ADD BAG
+function addBag() {
 
-  function toggleSidebar() { document.getElementById('sidebar').classList.toggle('open'); }
+  var bagId = document.getElementById("bagId").value;
 
-  // Dashboard
-  function renderDashboard() {
-    const orders = currentOrders;
-    document.getElementById('stat-total').textContent = orders.length;
-    document.getElementById('stat-active').textContent = orders.filter(o => o.status === 'Processing').length;
-    document.getElementById('stat-ready').textContent = orders.filter(o => o.status === 'Ready').length;
-    document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'Delivered').length;
+  fetch(API + "/api/bags?bagId=" + bagId + "&user=" + user.reg, {
+    method: "POST"
+  }).then(loadBags);
+}
 
-    const recent = orders.slice(-4).reverse();
-    const el = document.getElementById('dash-recent');
-    if (!recent.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🧺</div><p>No orders yet. Book your first slot!</p></div>'; return; }
-    el.innerHTML = renderTable(recent);
-  }
+// 📊 LOAD USER BAGS
+function loadBags() {
 
-  function renderTable(orders) {
-    if (!orders.length) return '<div class="empty-state"><div class="icon">🧺</div><p>No orders found.</p></div>';
-    return `<table class="orders-table">
-      <thead><tr><th>Order ID</th><th>Date</th><th>Slot</th><th>Service</th><th>Status</th></tr></thead>
-      <tbody>${orders.map(o => `<tr>
-        <td style="font-weight:600;font-family:'Syne',sans-serif">#${o.bagId || o.id}</td>
-        <td>${o.date}</td>
-        <td>${o.slot}</td>
-        <td>${o.service}</td>
-        <td><span class="badge badge-${o.status.toLowerCase()}">${o.status}</span></td>
-      </tr>`).join('')}</tbody>
-    </table>`;
-  }
+  fetch(API + "/api/bags/user?user=" + user.reg)
+  .then(res => res.json())
+  .then(data => {
 
-  function renderOrders() {
-    document.getElementById('orders-table-wrap').innerHTML = renderTable([...currentOrders].reverse());
-  }
+    var list = document.getElementById("list");
+    list.innerHTML = "";
 
-  function renderProfile() {
-    const u = session;
-    document.getElementById('profile-info').innerHTML = `
-      ${row('Name', u.name || '—')}
-      ${row('Registration No.', u.reg || '—')}
-      ${row('Email', u.email || '—')}
-      ${row('Block / Room', u.block ? u.block + ' / ' + u.room : '—')}
-      ${row('Phone', u.phone || '—')}
-    `;
-  }
-  function row(l, v) {
-    return `<div style="display:flex;justify-content:space-between;padding:0.75rem;background:var(--surface);border-radius:10px">
-      <span style="color:var(--muted);font-size:0.85rem">${l}</span>
-      <span style="font-weight:600;font-size:0.875rem">${v}</span>
-    </div>`;
-  }
+    for (var i = 0; i < data.length; i++) {
 
-  // Slots
-  const ALL_SLOTS = ['7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
-  let selectedSlot = null, selectedService = null;
+      var b = data[i];
 
-  function initDate() {
-    const d = document.getElementById('b-date');
-    const today = new Date(); today.setDate(today.getDate() + 1);
-    d.min = today.toISOString().split('T')[0];
-    d.value = today.toISOString().split('T')[0];
-    d.addEventListener('change', renderSlots);
-    renderSlots();
-  }
+      var li = document.createElement("li");
 
-  function renderSlots() {
-    const date = document.getElementById('b-date').value;
-    const bookedSlots = JSON.parse(localStorage.getItem('vitap_booked_slots_' + date) || '[]');
-    const grid = document.getElementById('slot-grid');
-    grid.innerHTML = ALL_SLOTS.map(s => {
-      const isBk = bookedSlots.includes(s);
-      return `<div class="slot-btn ${isBk ? 'booked' : ''}" onclick="${isBk ? '' : 'selectSlot(this)'}">${s}</div>`;
-    }).join('');
-    selectedSlot = null;
-  }
+      li.innerHTML =
+        b.bagId + " - " + b.status +
+        " <button onclick=\"startWash('" + b.bagId + "')\">Start</button>";
 
-  function selectSlot(el) {
-    document.querySelectorAll('.slot-btn').forEach(s => s.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedSlot = el.textContent;
-  }
+      list.appendChild(li);
+    }
+  });
+}
 
-  function selectService(el) {
-    document.querySelectorAll('.service-chip').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedService = el.dataset.svc;
-  }
+// ⏱️ START WASH
+function startWash(id) {
 
-  function bookSlot() {
-    const date = document.getElementById('b-date').value;
-    const clothes = document.getElementById('b-clothes').value;
-    const notes = document.getElementById('b-notes').value;
+  fetch(API + "/api/bags/start?bagId=" + id, {
+    method: "PUT"
+  }).then(loadBags);
+}
 
-    if (!selectedSlot) { showToast('⚠️ Please select a time slot', '#fb923c'); return; }
-    if (!selectedService) { showToast('⚠️ Please select a service type', '#fb923c'); return; }
+// 🚪 LOGOUT
+function logout() {
+  localStorage.removeItem("vitap_session");
+  window.location = "login.html";
+}
 
-    // Register Bag via backend
-    const bagId = String(Date.now()).slice(-6);
-    
-    fetch('https://smart-laundry-management-system.onrender.com/api/bags', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        bagId: bagId,
-        user: session.reg,
-        date: date,
-        slot: selectedSlot,
-        service: selectedService,
-        clothes: clothes,
-        notes: notes,
-        studentName: session.name,
-        block: session.block || '—',
-        createdAt: new Date().toISOString(),
-        status: 'Pending'
-      })
-    }).then(res => {
-      loadOrders(); // Refresh table
-      showToast('🎉 Slot booked successfully!', '#34d399');
-      selectedSlot = null; selectedService = null;
-      document.querySelectorAll('.service-chip').forEach(c => c.classList.remove('selected'));
-      document.getElementById('b-notes').value = '';
-      renderSlots();
-      setTimeout(() => showPanel_str('dashboard'), 1500);
-    }).catch(err => {
-      console.error(err);
-      setTimeout(() => showPanel_str('dashboard'), 1500);
-    });
-  }
-
-  function showPanel_str(id) {
-    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-    document.getElementById('panel-' + id).classList.add('active');
-    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-    document.querySelector('.nav-item').classList.add('active');
-    document.getElementById('page-title').textContent = 'Dashboard';
-    renderDashboard();
-  }
-
-  function showToast(msg, color) {
-    const t = document.getElementById('toast');
-    t.textContent = msg;
-    t.style.background = color || '#34d399';
-    t.style.color = (color === '#fb923c' || color === '#34d399') ? '#0a0f1e' : '#fff';
-    t.classList.add('show');
-    setTimeout(() => t.classList.remove('show'), 3000);
-  }
-
-  // Init
-  initDate();
-  loadOrders();
+loadBags();
 </script>
 </body>
 </html>
