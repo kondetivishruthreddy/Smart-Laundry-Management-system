@@ -358,7 +358,7 @@
             <textarea id="b-notes" placeholder="E.g., handle delicately, separate by colour..."></textarea>
           </div>
 
-          <button class="btn-book" onclick="bookSlot()">Confirm Booking</button>
+          <button onclick="bookSlot()">Book Slot</button>
         </div>
 
         <div class="card">
@@ -458,7 +458,59 @@ function loadBags() {
     }
   });
 }
+function loadOrders() {
 
+  var user = JSON.parse(localStorage.getItem("vitap_session"));
+
+  if (!user) {
+    alert("Login again");
+    window.location = "frontend/login.html";
+    return;
+  }
+
+  fetch(window.location.origin + "/api/bags/user?user=" + user.regno)
+  .then(res => res.json())
+  .then(data => {
+
+    console.log("ORDERS:", data);
+
+    var box = document.querySelector(".recent-orders"); // adjust if needed
+    box.innerHTML = "";
+
+    if (data.length === 0) {
+      box.innerHTML = "<p>No orders yet</p>";
+      return;
+    }
+
+    for (var i = 0; i < data.length; i++) {
+      var b = data[i];
+
+      var div = document.createElement("div");
+      div.innerHTML = b.bagId + " - " + b.status;
+
+      box.appendChild(div);
+    }
+  });
+}
+  function bookSlot() {
+
+  var user = JSON.parse(localStorage.getItem("vitap_session"));
+
+  if (!user) {
+    alert("Login again");
+    return;
+  }
+
+  var bagId = "BAG" + Math.floor(Math.random() * 10000);
+
+  fetch(window.location.origin + "/api/bags?bagId=" + bagId + "&user=" + user.regno, {
+    method: "POST"
+  })
+  .then(() => {
+    alert("Slot booked successfully!");
+    loadOrders(); // refresh
+  });
+}
 // ⏱️ START WASH
 function startWash(id) {
 
