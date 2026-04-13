@@ -301,7 +301,7 @@
     const reg = document.getElementById('s-reg').value.trim().toUpperCase();
     const pass = document.getElementById('s-pass').value;
 
-    fetch('http://localhost:8080/api/auth/login', {
+    fetch('https://smart-laundry-management-system.onrender.com/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ regno: reg, password: pass })
@@ -339,7 +339,7 @@
     const email = document.getElementById('a-email').value.trim().toLowerCase();
     const pass = document.getElementById('a-pass').value;
 
-    fetch('http://localhost:8080/api/auth/admin-login', {
+    fetch('https://smart-laundry-management-system.onrender.com/api/auth/admin-login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, password: pass })
